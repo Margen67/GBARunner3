@@ -44,4 +44,20 @@ public:
 
     /// @brief Type of border image to be used when enableCenterAndMask is true.
     GbaBorderImage borderImage = GbaBorderImage::Game;
+
+    /// @brief Specifies whether the visible area should be extended like a widescreen hack. The GBA screen is
+    ///        shifted by centerOffsetX and centerOffsetY on the DS screen and the surrounding area is drawn
+    ///        by the hardware too, from whatever the GBA software has in its backgrounds and sprites there.
+    ///        Because there is no capture involved, there is no added latency, no mask and no border.
+    ///        When this is true enableCenterAndMask is ignored. Offsets are limited to 16 horizontally and
+    ///        32 vertically. Per scanline effects (hblank dma or irq) end up offset vertically by centerOffsetY
+    ///        lines compared to the picture, so use a smaller centerOffsetY for games that depend on those.
+    bool16 extendVisibleArea = false;
+
+    /// @brief Returns whether the GBA screen is shown by capturing it and drawing it again on the other
+    ///        screen engine (center and mask), as opposed to directly displaying the main engine.
+    bool UsesCaptureCentering() const
+    {
+        return enableCenterAndMask && !extendVisibleArea;
+    }
 };

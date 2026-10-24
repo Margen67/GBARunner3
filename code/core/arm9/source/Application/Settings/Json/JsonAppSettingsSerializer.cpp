@@ -19,6 +19,7 @@
 #define KEY_DISPLAY_SETTINGS_MASK_WIDTH             "maskWidth"
 #define KEY_DISPLAY_SETTINGS_MASK_HEIGHT            "maskHeight"
 #define KEY_DISPLAY_SETTINGS_BORDER_IMAGE           "borderImage"
+#define KEY_DISPLAY_SETTINGS_EXTEND_VISIBLE_AREA    "extendVisibleArea"
 
 #define KEY_RUN_SETTINGS                                    "runSettings"
 #define KEY_RUN_SETTINGS_ENABLE_JIT                         "enableJit"
@@ -172,6 +173,7 @@ static void readDisplaySettings(const JsonObjectConst& json, DisplaySettings& di
     displaySettings.maskHeight
         = json[KEY_DISPLAY_SETTINGS_MASK_HEIGHT] | displaySettings.maskHeight;
     tryParseGbaBorderImage(json[KEY_DISPLAY_SETTINGS_BORDER_IMAGE], displaySettings.borderImage);
+    readBoolSetting(json[KEY_DISPLAY_SETTINGS_EXTEND_VISIBLE_AREA], displaySettings.extendVisibleArea);
 }
 
 static u32 parseHexString(const char* hexString)

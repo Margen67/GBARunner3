@@ -11,6 +11,7 @@
 #include "VirtualMachine/VMNestedIrq.h"
 #include "GbaDma.h"
 #include "MemoryEmulator/RomDefs.h"
+#include "Peripherals/Graphics/ExtendedView.h"
 #include "DmaTransfer.h"
 
 DTCM_DATA dma_state_t dma_state;
@@ -250,7 +251,14 @@ static inline void dma_immTransferRomSrc(u32 src, u32 dst, u32 byteCount, bool d
 
 static inline bool fastDmaSourceAllowed(u32 srcRegion)
 {
-    return 0b0011111111001100 & (1 << srcRegion);
+    u32 mask = 0b0011111111001100;
+    if (gExtendedViewOamActive)
+    {
+        // oam has to be read through the memory handlers to undo the sprite offset
+        mask &= ~(1 << 7);
+    }
+
+    return mask & (1 << srcRegion);
 }
 
 static inline bool fastDmaDestinationAllowed(u32 dstRegion)
@@ -259,6 +267,11 @@ static inline bool fastDmaDestinationAllowed(u32 dstRegion)
     if ((emu_ioRegisters[GBA_REG_OFFS_DISPCNT] & 7) >= 3)
     {
         mask &= ~(1 << 6);
+    }
+    if (gExtendedViewOamActive)
+    {
+        // oam has to be written through the memory handlers to apply the sprite offset
+        mask &= ~(1 << 7);
     }
 
     return mask & (1 << dstRegion);

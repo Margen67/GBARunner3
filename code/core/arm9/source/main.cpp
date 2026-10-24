@@ -18,6 +18,7 @@
 #include "Emulator/IoRegisters.h"
 #include "Core/Environment.h"
 #include "Peripherals/DmaTransfer.h"
+#include "Peripherals/Graphics/ExtendedView.h"
 #include "Logger/NitroEmulatorOutputStream.h"
 #include "Logger/PlainLogger.h"
 #include "Logger/NullLogger.h"
@@ -502,7 +503,7 @@ extern "C" void gbaRunnerMain(int argc, char* argv[])
 
     const auto& displaySettings = gAppSettingsService.GetAppSettings().displaySettings;
     gGbaDisplayConfigurationService.ApplyDisplaySettings(displaySettings);
-    if (displaySettings.enableCenterAndMask)
+    if (displaySettings.UsesCaptureCentering())
     {
         gGbaBorderService.SetupBorder(displaySettings.borderImage, gRomHeader.gameCode);
     }
@@ -514,6 +515,11 @@ extern "C" void gbaRunnerMain(int argc, char* argv[])
     memset((void*)((u32)GFX_BG_MAIN + 0x40000), 0, 128 * 1024); // vram B
     memset((void*)GFX_OBJ_MAIN, 0, 32 * 1024);
     memset(emu_ioRegisters, 0, sizeof(emu_ioRegisters));
+    if (displaySettings.extendVisibleArea)
+    {
+        // must come after the emulated io registers have been cleared
+        ext_enable(displaySettings.centerOffsetX, displaySettings.centerOffsetY);
+    }
     memu_initializeArmDispatchTable();
     vm_initializeUndefinedArmTable();
     setupJit();

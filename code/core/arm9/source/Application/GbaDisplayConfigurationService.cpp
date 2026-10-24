@@ -97,9 +97,10 @@ void GbaDisplayConfigurationService::SetupCenterAndMask(const DisplaySettings& d
 
 void GbaDisplayConfigurationService::SetupGbaScreen(const DisplaySettings& displaySettings)
 {
+    const bool useCapture = displaySettings.UsesCaptureCentering();
     if (displaySettings.gbaScreen == GbaScreen::Top)
     {
-        if (displaySettings.enableCenterAndMask)
+        if (useCapture)
             sys_setMainEngineToBottomScreen();
         else
             sys_setMainEngineToTopScreen();
@@ -108,7 +109,7 @@ void GbaDisplayConfigurationService::SetupGbaScreen(const DisplaySettings& displ
     }
     else
     {
-        if (displaySettings.enableCenterAndMask)
+        if (useCapture)
             sys_setMainEngineToTopScreen();
         else
             sys_setMainEngineToBottomScreen();
@@ -117,7 +118,7 @@ void GbaDisplayConfigurationService::SetupGbaScreen(const DisplaySettings& displ
     }
 
     REG_DISPCAPCNT = 0x00360000;
-    if (displaySettings.enableCenterAndMask)
+    if (useCapture)
     {
         SetupCenterAndMask(displaySettings);
     }
@@ -140,7 +141,7 @@ void GbaDisplayConfigurationService::SetupColorCorrection(const DisplaySettings&
 
 void GbaDisplayConfigurationService::SetupGbaScreenBrightness(const DisplaySettings& displaySettings)
 {
-    if (displaySettings.enableCenterAndMask)
+    if (displaySettings.UsesCaptureCentering())
     {
         REG_MASTER_BRIGHT = 0x8000 | 16;
         REG_MASTER_BRIGHT_SUB = 0x8000 | (16 - displaySettings.gbaScreenBrightness);
